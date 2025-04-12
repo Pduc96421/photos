@@ -12,6 +12,9 @@ import { Link, useParams } from "react-router-dom";
 import "./styles.css";
 import models from "../../modelData/models";
 
+
+
+
 /**
  * Define UserPhotos, a React component of Project 4.
  * This component displays all photos belonging to a specific user.
