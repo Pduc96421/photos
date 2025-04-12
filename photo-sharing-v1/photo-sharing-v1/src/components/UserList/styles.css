@@ -1,0 +1,16 @@
+.user-list {
+  padding: 16px 8px;
+}
+
+.user-list-header {
+  margin-bottom: 8px;
+  padding-left: 16px;
+}
+
+.user-list-item {
+  transition: background-color 0.3s;
+}
+
+.user-list-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
