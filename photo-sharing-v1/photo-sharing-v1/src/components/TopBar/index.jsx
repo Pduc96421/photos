@@ -10,22 +10,22 @@ import "./styles.css";
  */
 function TopBar() {
   const location = useLocation();
-  const pathParts = location.pathname.split('/');
-  
+  const pathParts = location.pathname.split("/");
+
   let userId = null;
   let contextInfo = "";
-  
+
   // Check for user details or photos route
   if (pathParts.length >= 3) {
     if (pathParts[1] === "users" || pathParts[1] === "photos") {
       userId = pathParts[2];
-      
+
       // If we have a userId, fetch the user information
       if (userId) {
         const user = models.userModel(userId);
         if (user) {
-          const userName = `${user.first_name} ${user.last_name || ''}`;
-          
+          const userName = `${user.first_name} ${user.last_name || ""}`;
+
           // Determine what to display based on the current route
           if (pathParts[1] === "photos") {
             contextInfo = `Photos of ${userName}`;
@@ -36,7 +36,7 @@ function TopBar() {
       }
     }
   }
-  
+
   return (
     <AppBar position="fixed">
       <Toolbar>
@@ -44,13 +44,9 @@ function TopBar() {
         <Typography variant="h6" style={{ flexGrow: 1 }}>
           Phạm Văn Đức
         </Typography>
-        
+
         {/* Right side - Context information */}
-        {contextInfo && (
-          <Typography variant="body1">
-            {contextInfo}
-          </Typography>
-        )}
+        {contextInfo && <Typography variant="body1">{contextInfo}</Typography>}
       </Toolbar>
     </AppBar>
   );
