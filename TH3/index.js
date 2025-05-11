@@ -7,16 +7,15 @@ require("dotenv").config();
 const routeApiVer1 = require("./api/v1/routes/index.route");
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 database.connect();
 
-// parse application/json
+// Middleware
 app.use(bodyParser.json());
-
 app.use(cors());
 
-// Routes Version 1
+// Khai báo routes
 routeApiVer1(app);
 
 app.listen(port, () => {

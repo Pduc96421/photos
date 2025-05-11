@@ -5,8 +5,8 @@ module.exports = (app) => {
 
   const version = "/api/v1";
   
-  app.use(version + "/photos", userRoutes);
+  app.use(version + "/users", userRoutes);
   
-  app.use(version + "/users", photoRoutes);
+  app.use(version + "/photos", photoRoutes);
 
 }

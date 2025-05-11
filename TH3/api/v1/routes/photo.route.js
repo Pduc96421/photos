@@ -1,40 +1,54 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const User = require("../models/user.model");
-const Photo = require("../models/photo.model");
+const User = require('../models/user.model');
+const Photo = require('../models/photo.model');
 
-// GET /api/v1/photo/user/:id
-router.get("/user/:id", async (req, res) => {
+// GET /api/v1/photos/:user_id
+router.get('/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
+
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(400).send({ error: "Invalid user ID" });
+    // Kiểm tra người dùng có tồn tại không
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
 
-    const photos = await Photo.find({ user_id: req.params.id });
+    const photos = await Photo.find({ user_id: userId });
 
-    const result = await Promise.all(photos.map(async (photo) => {
-      const comments = await Promise.all(photo.comments.map(async (cmt) => {
-        const commentUser = await User.findById(cmt.user_id).select("_id first_name last_name");
-        return {
-          _id: cmt._id,
-          comment: cmt.comment,
-          date_time: cmt.date_time,
-          user: commentUser
-        };
-      }));
+    const result = [];
 
-      return {
+    // Duyệt qua từng ảnh
+    for (const photo of photos) {
+      const formattedComments = [];
+
+      // Duyệt qua từng comment trong ảnh
+      for (const comment of photo.comments) {
+        const commenter = await User.findById(comment.user_id).select('_id first_name last_name');
+
+        formattedComments.push({
+          _id: comment._id,
+          comment: comment.comment,
+          date_time: comment.date_time,
+          user: commenter
+        });
+      }
+
+      // Thêm ảnh đã định dạng vào kết quả
+      result.push({
         _id: photo._id,
         user_id: photo.user_id,
         file_name: photo.file_name,
         date_time: photo.date_time,
-        comments
-      };
-    }));
+        comments: formattedComments
+      });
+    }
 
     res.json(result);
   } catch (err) {
-    res.status(400).send({ error: "Error retrieving photos or comments" });
+    console.error('Error retrieving photos:', err);
+    res.status(500).json({ error: 'Server error retrieving photos' });
   }
 });
 

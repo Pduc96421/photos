@@ -15,8 +15,13 @@ router.get("/list", async (req, res) => {
 // GET /api/v1/user/:id
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select("_id first_name last_name location description occupation");
+    const userId = req.params.id;
+    const user = await User.findById(userId).select(
+      "_id first_name last_name location description occupation"
+    );
+
     if (!user) return res.status(400).send({ error: "User not found" });
+
     res.json(user);
   } catch (err) {
     res.status(400).send({ error: "Invalid user ID" });
