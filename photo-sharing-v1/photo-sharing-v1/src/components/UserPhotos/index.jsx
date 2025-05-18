@@ -12,17 +12,12 @@ import { Link, useParams } from "react-router-dom";
 import "./styles.css";
 import models from "../../modelData/models";
 
-
-
-
-/**
- * Define UserPhotos, a React component of Project 4.
- * This component displays all photos belonging to a specific user.
- */
 function UserPhotos() {
   const { userId } = useParams();
   const photos = models.photoOfUserModel(userId);
+  console.log(photos);
   const user = models.userModel(userId);
+  console.log(user);
 
   // Helper function to format date string
   const formatDate = (dateString) => {

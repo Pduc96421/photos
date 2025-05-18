@@ -7,7 +7,7 @@ require("dotenv").config();
 const routeApiVer1 = require("./api/v1/routes/index.route");
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT;
 
 database.connect();
 

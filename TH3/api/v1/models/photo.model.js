@@ -1,28 +1,30 @@
 const mongoose = require("mongoose");
-
 const Schema = mongoose.Schema;
 
-// Schema cho một comment
-const commentSchema = new Schema({
-  comment: { type: String, required: true },
-  date_time: { type: Date, required: true },
-  user_id: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-});
-
-// Schema cho một bức ảnh
 const photoSchema = new Schema({
-  file_name: { type: String, required: true },
-  date_time: { type: Date, required: true },
-  user_id: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
+  _id: {
+    type: String,
+    require: true,
+  },
+  file_name: {
+    type: String,
     required: true,
   },
-  comments: [commentSchema],
+  date_time: {
+    type: Date,
+    default: Date.now,
+  },
+  user_id: {
+    type: String,
+    required: true,
+  },
+  comments: [
+    {
+      user_id: String,
+      photo_id: String,
+      comment: String,
+    },
+  ],
 });
 
 const Photo = mongoose.model("Photo", photoSchema, "photos");

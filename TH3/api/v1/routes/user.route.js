@@ -1,31 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/user.model");
 
-// GET /api/v1/user/list
-router.get("/list", async (req, res) => {
-  try {
-    const users = await User.find({}, "_id first_name last_name");
-    res.json(users);
-  } catch (err) {
-    res.status(500).send({ error: "Server error" });
-  }
-});
+const controller = require("../controllers/user.controller");
 
-// GET /api/v1/user/:id
-router.get("/:id", async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const user = await User.findById(userId).select(
-      "_id first_name last_name location description occupation"
-    );
+// GET /api/v1/users/list
+router.get("/list", controller.listUser);
 
-    if (!user) return res.status(400).send({ error: "User not found" });
-
-    res.json(user);
-  } catch (err) {
-    res.status(400).send({ error: "Invalid user ID" });
-  }
-});
+// GET /api/v1/users/:id
+router.get("/:id", controller.detailUser);
 
 module.exports = router;
