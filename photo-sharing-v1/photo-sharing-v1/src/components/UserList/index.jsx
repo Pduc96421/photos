@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Divider,
   List,
@@ -9,16 +10,35 @@ import {
 import { Link } from "react-router-dom";
 
 import "./styles.css";
-import models from "../../modelData/models";
 
 function UserList() {
-  const [users, setUsers] = useState();
-  
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    const usersData = models.userListModel();
-    setUsers(usersData);
-    console.log(users);
-  }, [users]);
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/v1/users/list");
+        setUsers(response.data);
+      } catch (err) {
+        console.error("Lỗi khi fetch user:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  if (loading) {
+    return <Typography>Đang tải danh sách người dùng...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">Lỗi: {error}</Typography>;
+  }
 
   return (
     <div className="user-list">

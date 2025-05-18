@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Card,
@@ -10,14 +10,37 @@ import {
 } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import "./styles.css";
-import models from "../../modelData/models";
+import axios from "axios";
 
 function UserPhotos() {
   const { userId } = useParams();
-  const photos = models.photoOfUserModel(userId);
-  console.log(photos);
-  const user = models.userModel(userId);
-  console.log(user);
+  const [user, setUser] = useState(null);
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserAndPhotos = async () => {
+      try {
+        const userRes = await axios.get(
+          `http://localhost:8080/api/v1/users/${userId}`
+        );
+        setUser(userRes.data);
+
+        const photoRes = await axios.get(
+          `http://localhost:8080/api/v1/photos/user/${userId}`
+        );
+        setPhotos(photoRes.data);
+      } catch (err) {
+        console.error("Lỗi khi lấy dữ liệu:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAndPhotos();
+  }, [userId]);
 
   // Helper function to format date string
   const formatDate = (dateString) => {
@@ -25,6 +48,10 @@ function UserPhotos() {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
+
+  if (loading) return <Typography>Đang tải dữ liệu...</Typography>;
+  if (error) return <Typography color="error">Lỗi: {error}</Typography>;
+  if (!user) return <Typography>Không tìm thấy người dùng.</Typography>;
 
   return (
     <div className="user-photos">
