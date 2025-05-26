@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 module.exports.connect = async () => {
   try {
     mongoose.connect(process.env.MONGO_URL);
-    console.log("Connect Success!");
+    console.log("Connect DataBase MongoDB Success!");
   } catch (error) {
-    console.log("Connect Error!");
+    console.log("Connect DataBase MongoDB Error!");
   }
 }

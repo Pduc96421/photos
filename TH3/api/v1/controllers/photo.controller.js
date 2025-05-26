@@ -34,3 +34,23 @@ module.exports.getPhotoById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/v1//photos/allPhoto
+module.exports.getAllPhotos = async (req, res) => {
+  try {
+    const photos = await Photo.find();
+
+    if (!photos.length) {
+      return res.status(404).json({ message: "Không tìm thấy ảnh nào" });
+    }
+
+    // 3. Trả về object photo
+    res.status(200).json({
+      code: 200,
+      message: "Lấy ảnh thành công",
+      result: photos,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -9,4 +9,6 @@ router.get("/list", controller.listUser);
 // GET /api/v1/users/:id
 router.get("/:id", controller.detailUser);
 
+router.post("/auth/login", controller.loginUser);
+
 module.exports = router;

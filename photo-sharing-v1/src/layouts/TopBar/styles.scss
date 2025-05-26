@@ -1,0 +1,38 @@
+.topbar-container {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.login-btn,
+.register-btn,
+.logout-btn {
+  background-color: #1633b4;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.login-btn:hover,
+.register-btn:hover,
+.logout-btn:hover {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.context-info {
+  color: black;
+  font-weight: 500;
+}

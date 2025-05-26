@@ -1,0 +1,24 @@
+.user-photos {
+  padding: 20px;
+}
+
+.photos-header {
+  margin-bottom: 20px;
+}
+
+.photos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.photo-card {
+  margin-bottom: 20px;
+}
+
+.photo-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
