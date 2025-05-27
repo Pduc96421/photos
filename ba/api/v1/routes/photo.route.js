@@ -2,12 +2,24 @@ const express = require("express");
 const router = express.Router();
 
 const photoController = require("../controllers/photo.controller");
-const verifyToken = require("../../../middleware/auth");
+const middlewareAuth = require("../../../middleware/auth.middleware");
+const upload = require("../../../middleware/upload.middleware");
 
-router.get('/user/:userId', photoController.getPhotosByUser);
+router.get("/:userId/user", middlewareAuth.verifyToken, photoController.getPhotosByUser);
 
-router.get('/photo/:photoId', photoController.getPhotoById);
+router.get("/:photoId/photo", photoController.getPhotoById);
 
-router.get('/allPhoto', verifyToken, photoController.getAllPhotos);
+router.get(
+  "/allPhoto",
+  middlewareAuth.verifyToken,
+  photoController.getAllPhotos
+);
+
+router.post(
+  "/create",
+  middlewareAuth.verifyToken,
+  upload.single("file_name"),
+  photoController.createPhoto
+);
 
 module.exports = router;

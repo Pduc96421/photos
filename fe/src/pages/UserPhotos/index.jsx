@@ -21,8 +21,6 @@ function UserPhotos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [comments, setComments] = useState([]);
-
   useEffect(() => {
     const fetchUserAndPhotos = async () => {
       try {

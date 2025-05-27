@@ -1,6 +1,6 @@
 const Photo = require("../models/photo.model");
 const Comment = require("../models/comment.model");
-const User = require("../models/user.model");
+const mongoose = require("mongoose");
 
 // POST /api/v1/comments/:photoId
 exports.addCommentToPhoto = async (req, res) => {
@@ -30,7 +30,7 @@ exports.addCommentToPhoto = async (req, res) => {
 
     photo.comments.push(savedComment._id);
     await photo.save();
-    
+
     const populatedComment = await Comment.findById(savedComment._id).populate({
       path: "user_id",
       select: "-password",
@@ -53,8 +53,10 @@ exports.getCommentsByPhoto = async (req, res) => {
   try {
     const photoId = req.params.photoId;
 
-    const comments = await Comment.find({ photo_id: photoId })
-      .populate({ path: "user", select: "-password" })
+    const comments = await Comment.find({
+      photo_id: photoId,
+    })
+      .populate({ path: "user_id", select: "-password" })
       .sort({ date_time: -1 });
 
     if (!comments.length) {

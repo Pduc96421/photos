@@ -4,17 +4,28 @@ const Photo = require("../models/photo.model");
 module.exports.getPhotosByUser = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const photos = await Photo.find({ user_id: userId });
+
+    const photos = await Photo.find({ user_id: userId })
+      .populate({
+        path: "comments",
+        select: "_id",
+      });
 
     if (!photos.length) {
-      return res
-        .status(404)
-        .json({ message: "No photos found for this user." });
+      return res.status(404).json({
+        code: 404,
+        message: "Không tìm thấy ảnh cho người dùng này.",
+      });
     }
 
-    res.status(200).json(photos);
+    res.status(200).json({
+      code: 200,
+      message: "Hình ảnh trả về thành công",
+      result: photos,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Lỗi khi lấy ảnh theo user:", err);
+    res.status(500).json({ code: 500, error: err.message });
   }
 };
 
@@ -52,5 +63,39 @@ module.exports.getAllPhotos = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+// POST /api/v1/photos/create
+exports.createPhoto = async (req, res) => {
+  try {
+    const user_id = req.user?.id;
+    const file = req.file; // ⬅ lấy file từ multer
+
+    if (!file || !user_id) {
+      return res.status(400).json({
+        code: 400,
+        message: "Thiếu ảnh hoặc thông tin người dùng",
+      });
+    }
+
+    const newPhoto = new Photo({
+      file_name: file.filename, // ⬅ dùng file_name từ multer
+      user_id,
+    });
+
+    const savedPhoto = await newPhoto.save();
+
+    res.status(201).json({
+      code: 201,
+      message: "Tạo ảnh thành công",
+      result: savedPhoto,
+    });
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      message: "Lỗi server",
+      error: err.message,
+    });
   }
 };

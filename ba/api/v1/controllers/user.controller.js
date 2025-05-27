@@ -1,6 +1,5 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 
 // GET /api/v1/users/list
 module.exports.listUser = async (req, res) => {
@@ -53,16 +52,46 @@ module.exports.loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    res.cookie("token", token);
 
     res.status(200).json({
       code: 200,
       message: "Đăng nhập thành công",
       result: token,
+    });
+  } catch (err) {
+    res.status(500).send({ error: "Server bị lỗi" });
+  }
+};
+
+// Post /api/v1/users/auth/register
+module.exports.registerUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({
+        code: 400,
+        message: "username và password là bắt buộc",
+      });
+    }
+
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({
+        code: 400,
+        message: "Người dùng đã tồn tại",
+      });
+    }
+
+    const newUser = new User(req.body);
+
+    await newUser.save();
+
+    res.status(200).json({
+      code: 200,
+      message: "Đăng ký thành công",
+      result: { id: newUser._id, username: newUser.username },
     });
   } catch (err) {
     res.status(500).send({ error: "Server bị lỗi" });
