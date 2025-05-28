@@ -4,11 +4,16 @@ import UserDetail from "../pages/UserDetail";
 import UserList from "../layouts/UserList";
 import UserPhotos from "../pages/UserPhotos";
 import PrivateRoutes from "../components/PrivateRoutes/PrivateRoutes";
+import Register from "../pages/Register/Register";
 
 const Routes = [
   {
     path: "/auth/login",
     element: <Login />,
+  },
+  {
+    path: "/auth/register",
+    element: <Register />,
   },
   {
     element: <PrivateRoutes />,
@@ -18,7 +23,7 @@ const Routes = [
         element: <LayoutDefault />,
         children: [
           {
-            path: "/users",
+            path: "users",
             children: [
               {
                 path: ":userId",
@@ -31,7 +36,7 @@ const Routes = [
             ],
           },
           {
-            path: "/photos",
+            path: "photos",
             children: [
               {
                 path: ":userId",

@@ -70,7 +70,7 @@ module.exports.getAllPhotos = async (req, res) => {
 exports.createPhoto = async (req, res) => {
   try {
     const user_id = req.user?.id;
-    const file = req.file; // ⬅ lấy file từ multer
+    const file = req.file;
 
     if (!file || !user_id) {
       return res.status(400).json({
@@ -80,14 +80,14 @@ exports.createPhoto = async (req, res) => {
     }
 
     const newPhoto = new Photo({
-      file_name: file.filename, // ⬅ dùng file_name từ multer
+      file_name: file.filename,
       user_id,
     });
 
     const savedPhoto = await newPhoto.save();
 
-    res.status(201).json({
-      code: 201,
+    res.status(200).json({
+      code: 200,
       message: "Tạo ảnh thành công",
       result: savedPhoto,
     });

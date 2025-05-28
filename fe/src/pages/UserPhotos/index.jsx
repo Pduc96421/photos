@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  Typography,
-  Card,
-  CardContent,
-  CardMedia,
-  Link as MuiLink,
-  Box,
-  Divider,
-} from "@mui/material";
-import { Link, useParams } from "react-router-dom";
+import { Typography, Card, CardContent, CardMedia } from "@mui/material";
+import { useParams } from "react-router-dom";
 import "./styles.css";
 import axios from "axios";
 import LoadingUi from "../../components/LoadingUi/LoadingUi";
 import CommentList from "../CommentList/CommentList";
+import { getCookie } from "../../helpers/cookie";
 
 function UserPhotos() {
   const { userId } = useParams();
@@ -20,6 +13,7 @@ function UserPhotos() {
   const [photos, setPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const token = getCookie("token");
 
   useEffect(() => {
     const fetchUserAndPhotos = async () => {
@@ -30,9 +24,14 @@ function UserPhotos() {
         setUser(userRes.data);
 
         const photoRes = await axios.get(
-          `http://localhost:8080/api/v1/photos/user/${userId}`
+          `http://localhost:8080/api/v1/photos/${userId}/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        setPhotos(photoRes.data);
+        setPhotos(photoRes.data.result);
       } catch (err) {
         console.error("Lỗi khi lấy dữ liệu:", err);
         setError(err.message);
@@ -42,7 +41,7 @@ function UserPhotos() {
     };
 
     fetchUserAndPhotos();
-  }, [userId]);
+  }, [token, userId]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -71,7 +70,7 @@ function UserPhotos() {
             <CardMedia
               component="img"
               className="photo-image"
-              image={require(`../../images/${photo.file_name}`)}
+              image={require(`../../../../ba/images/${photo.file_name}`)}
               alt={`Photo by ${user ? user.first_name : ""}`}
             />
 
@@ -80,9 +79,7 @@ function UserPhotos() {
                 Posted on {formatDate(photo.date_time)}
               </Typography>
 
-              {photo.comments && photo.comments.length > 0 && (
-                <CommentList photoId={photo._id} />
-              )}
+              <CommentList photoId={photo._id} />
             </CardContent>
           </Card>
         ))}

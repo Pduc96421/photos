@@ -3,9 +3,12 @@ import { Link } from "react-router-dom";
 import "./CommentList.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { getCookie } from "../../helpers/cookie";
+import SendComment from "../SendComment/SendComment";
 
 function CommentList({ photoId }) {
   const [comments, setComments] = useState([]);
+  const token = getCookie("token");
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -13,44 +16,54 @@ function CommentList({ photoId }) {
     return date.toLocaleString();
   };
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8080/api/v1/comments/${photoId}`
-        );
-
-        if (res.status === 200) {
-          setComments(res.data.result || []);
+  const fetchComments = async () => {
+    try {
+      const resComments = await axios.get(
+        `http://localhost:8080/api/v1/comments/${photoId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (error) {
-        console.error("Lỗi khi lấy bình luận:", error);
-      }
-    };
+      );
 
+      if (resComments.status === 200) {
+        setComments(resComments.data.result || []);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy bình luận:", error);
+    }
+  };
+
+  useEffect(() => {
     if (photoId) {
       fetchComments();
     }
-  }, [photoId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photoId, token]);
 
-  if (!comments || comments.length === 0) return null;
+  // if (!comments || comments.length === 0) return null;
 
   return (
     <Box className="comments-section" mt={2}>
       <Typography variant="h6">Comments</Typography>
-      <Divider />
+      <SendComment photoId={photoId} onCommentSent={fetchComments} />
+
+      <Divider sx={{ my: 2 }} />
 
       {comments.map((comment, index) => (
-        <Box key={index} className="comment" mt={1} mb={1}>
-          <Typography variant="body2" color="textSecondary">
+        <Box key={comment._id} className="comment" mt={1} mb={1}>
+          <Typography variant="body2" color="textSecondary" component="div">
             {formatDate(comment.date_time)} -{" "}
             <MuiLink
               component={Link}
-              to={`/users/${comment.user._id}`}
+              to={`/users/${comment.user_id?._id}`}
               className="user-link"
             >
-              {comment.user
-                ? `${comment.user.first_name} ${comment.user.last_name || ""}`
+              {comment.user_id
+                ? `${comment.user_id.first_name} ${
+                    comment.user_id.last_name || ""
+                  }`
                 : "Unknown User"}
             </MuiLink>
           </Typography>

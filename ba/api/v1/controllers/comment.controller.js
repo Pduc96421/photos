@@ -59,12 +59,6 @@ exports.getCommentsByPhoto = async (req, res) => {
       .populate({ path: "user_id", select: "-password" })
       .sort({ date_time: -1 });
 
-    if (!comments.length) {
-      return res
-        .status(404)
-        .json({ code: 404, message: "không có bình luận cho ảnh này." });
-    }
-
     res.status(200).json({
       code: 200,
       message: "Lấy bình luận thành công",
