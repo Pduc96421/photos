@@ -1,15 +1,19 @@
 import { useForm } from "react-hook-form";
 import "./Register.scss";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
+    watch, // lấy ra giá trị watch để so sánh mật khẩu
     formState: { errors },
   } = useForm();
+
+  const password = watch("password");
 
   const onSubmit = async (data) => {
     try {
@@ -24,7 +28,7 @@ function Register() {
       );
 
       if (response.status === 200) {
-        console.log( response.data.message);
+        console.log(response.data.message);
         navigate("/auth/login");
       } else {
         console.error("Đăng kí thất bại:", response.data.message);
@@ -43,28 +47,25 @@ function Register() {
         <input
           id="username"
           type="text"
-          {...register("username", { required: true })}
+          {...register("username", { required: "Username is required" })}
         />
-        {errors.username && <p className="error">Username is required</p>}
+        {errors.username && <p className="error">{errors.username.message}</p>}
 
         <label htmlFor="password">Password: </label>
         <input
           id="password"
           type="password"
-          {...register("password", { required: true })}
+          {...register("password", { required: "Password is required" })}
         />
-        {errors.password && <p className="error">Password is required</p>}
+        {errors.password && <p className="error">{errors.password.message}</p>}
 
         <label htmlFor="confirmPassword">Confirm Password: </label>
         <input
           id="confirmPassword"
           type="password"
           {...register("confirmPassword", {
-            required: true,
-            validate: (value) =>
-              value ===
-              document.querySelector('input[name="password"]').value ||
-              "Passwords do not match",
+            required: "Confirm password is required",
+            validate: (value) => value === password || "Passwords do not match",
           })}
         />
         {errors.confirmPassword && (
@@ -79,7 +80,7 @@ function Register() {
 
         <button type="submit">Register</button>
         <p>
-          Already have an account? <a href="/auth/login">Login</a>
+          Already have an account? <Link to="/auth/login">Login</Link>
         </p>
       </form>
     </>

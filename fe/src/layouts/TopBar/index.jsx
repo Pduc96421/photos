@@ -29,7 +29,7 @@ function TopBar() {
   useEffect(() => {
     const decodeToken = jwtDecode(token);
     // console.log("Decoded Token:", decodeToken);
-    setUsername(decodeToken.username || "");
+    setUsername(`${decodeToken.first_name} ${decodeToken.last_name}`);
   }, [token]);
 
   const handleFileChange = async (e) => {

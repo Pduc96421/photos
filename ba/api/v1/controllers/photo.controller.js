@@ -5,11 +5,10 @@ module.exports.getPhotosByUser = async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const photos = await Photo.find({ user_id: userId })
-      .populate({
-        path: "comments",
-        select: "_id",
-      });
+    const photos = await Photo.find({ user_id: userId }).populate({
+      path: "comments",
+      select: "_id date_time",
+    });
 
     if (!photos.length) {
       return res.status(404).json({
@@ -55,7 +54,6 @@ module.exports.getAllPhotos = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy ảnh nào" });
     }
 
-    // 3. Trả về object photo
     res.status(200).json({
       code: 200,
       message: "Lấy ảnh thành công",

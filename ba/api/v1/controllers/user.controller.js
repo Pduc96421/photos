@@ -31,23 +31,28 @@ module.exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({
-        code: 400,
-        message: "username và password là bắt buộc",
-      });
-    }
-
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({
-        code: 401,
+      return res.status(400).json({
+        code: 400,
         message: "Người dùng không tồn tại",
       });
     }
 
+    if (password !== user.password) {
+      return res.status(400).json({
+        code: 400,
+        message: "Mật khẩu không đúng",
+      });
+    }
+
     const token = jwt.sign(
-      { id: user._id, username: user.username },
+      {
+        id: user._id,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -67,14 +72,7 @@ module.exports.loginUser = async (req, res) => {
 // Post /api/v1/users/auth/register
 module.exports.registerUser = async (req, res) => {
   try {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({
-        code: 400,
-        message: "username và password là bắt buộc",
-      });
-    }
+    const { username } = req.body;
 
     const existingUser = await User.findOne({ username });
     if (existingUser) {
