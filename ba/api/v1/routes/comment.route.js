@@ -8,4 +8,6 @@ router.post("/:photoId", commentController.addCommentToPhoto);
 
 router.get("/:photoId", commentController.getCommentsByPhoto);
 
+router.delete('/:commentId', commentController.deleteComment);
+
 module.exports = router;

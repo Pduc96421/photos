@@ -13,4 +13,6 @@ router.get("/allPhoto", photoController.getAllPhotos);
 
 router.post("/create", upload.single("file_name"), photoController.createPhoto);
 
+router.delete("/:photoId", photoController.deletePhoto);
+
 module.exports = router;

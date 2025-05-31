@@ -1,3 +1,4 @@
+const Comment = require("../models/comment.model");
 const Photo = require("../models/photo.model");
 
 // GET /api/v1/photos/user/:userId
@@ -95,5 +96,42 @@ exports.createPhoto = async (req, res) => {
       message: "Lỗi server",
       error: err.message,
     });
+  }
+};
+
+// DELETE /api/v1/photos/:photoId
+exports.deletePhoto = async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    const userId = req.user?.id;
+
+    const photo = await Photo.findOne({
+      _id: photoId,
+    });
+
+    if (!photo) {
+      return res.status(404).json({ message: "Không tìm thấy ảnh" });
+    }
+
+    if (photo.user_id.toString() !== userId) {
+      return res.status(403).json({
+        code: 403,
+        message: "Bạn không có quyền xóa ảnh này",
+      });
+    }
+
+    console.log(photo.comments);
+
+    const comments = photo.comments || [];
+    await Comment.deleteMany({ _id: { $in: comments } });
+
+    await Photo.deleteOne({ _id: photoId });
+
+    res.status(200).json({
+      code: 200,
+      message: "Xóa ảnh thành công",
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 module.exports.verifyToken = (req, res, next) => {
-  // const authHeader = req.headers["authorization"];
-  // const token = authHeader && authHeader.split(" ")[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
-  const token = req.cookies.token;
+  // const token = req.cookies.token;
 
   if (!token)
     return res.status(401).json({ code: 401, message: "Không có token" });

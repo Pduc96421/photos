@@ -1,9 +1,8 @@
 const Photo = require("../models/photo.model");
 const Comment = require("../models/comment.model");
-const mongoose = require("mongoose");
 
 // POST /api/v1/comments/:photoId
-exports.addCommentToPhoto = async (req, res) => {
+module.exports.addCommentToPhoto = async (req, res) => {
   try {
     const { comment } = req.body;
     const photoId = req.params.photoId;
@@ -49,7 +48,7 @@ exports.addCommentToPhoto = async (req, res) => {
 };
 
 // GET /api/v1/comments/:photoId
-exports.getCommentsByPhoto = async (req, res) => {
+module.exports.getCommentsByPhoto = async (req, res) => {
   try {
     const photoId = req.params.photoId;
 
@@ -67,4 +66,47 @@ exports.getCommentsByPhoto = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+// DELETE //api/v1/comments/:commentId
+module.exports.deleteComment = async (req, res) => {
+  const commentId = req.params.commentId;
+  const userId = req.user?.id;
+
+  const comment = await Comment.findOne({
+    _id: commentId,
+  });
+
+  if (!comment) {
+    res.status(401).json({
+      code: 401,
+      message: "Không tìm thấy bình luận",
+    });
+    return;
+  }
+
+  if (comment.user_id.toString() !== userId) {
+    res.status(403).json({
+      code: 403,
+      message: "Bạn không có quyền xóa",
+    });
+    return;
+  }
+
+  const photo = await Photo.findOne({ _id: comment.photo_id });
+
+  if (photo) {
+    photo.comments = photo.comments.filter(
+      (commentId) => commentId.toString() !== comment._id.toString()
+    );
+    await photo.save();
+  }
+
+  await Comment.deleteOne({ _id: commentId });
+
+  res.status(200).json({
+    code: 200,
+    message: "Xóa bình luận thành công",
+    result: [],
+  });
 };
