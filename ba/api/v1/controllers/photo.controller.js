@@ -5,6 +5,7 @@ const Photo = require("../models/photo.model");
 module.exports.getPhotosByUser = async (req, res) => {
   try {
     const userId = req.params.userId;
+    const myUserId = req.user?.id;
 
     const photos = await Photo.find({ user_id: userId }).populate({
       path: "comments",
@@ -18,10 +19,25 @@ module.exports.getPhotosByUser = async (req, res) => {
       });
     }
 
+    const newPhotos = photos.map((photo) => {
+      const isLiked = photo.like.some(
+        (like) => like.user_id.toString() === myUserId
+      );
+      return {
+        _id: photo._id,
+        file_name: photo.file_name,
+        user_id: photo.user_id,
+        comments: photo.comments,
+        date_time: photo.date_time,
+        likeLength: photo.like.length,
+        isLiked: isLiked,
+      };
+    });
+
     res.status(200).json({
       code: 200,
       message: "Hình ảnh trả về thành công",
-      result: photos,
+      result: newPhotos,
     });
   } catch (err) {
     console.error("Lỗi khi lấy ảnh theo user:", err);
@@ -66,7 +82,7 @@ module.exports.getAllPhotos = async (req, res) => {
 };
 
 // POST /api/v1/photos/create
-exports.createPhoto = async (req, res) => {
+module.exports.createPhoto = async (req, res) => {
   try {
     const user_id = req.user?.id;
     const file = req.file;
@@ -100,7 +116,7 @@ exports.createPhoto = async (req, res) => {
 };
 
 // DELETE /api/v1/photos/:photoId
-exports.deletePhoto = async (req, res) => {
+module.exports.deletePhoto = async (req, res) => {
   try {
     const { photoId } = req.params;
     const userId = req.user?.id;
@@ -133,5 +149,50 @@ exports.deletePhoto = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+// POST /api/v1/photos/:photoId/like
+module.exports.likePhoto = async (req, res) => {
+  try {
+    const { photoId } = req.params;
+    const userId = req.user?.id;
+
+    const photo = await Photo.findById(photoId);
+
+    if (!photo) {
+      return res.status(404).json({
+        code: 404,
+        message: "Không tìm thấy ảnh",
+      });
+    }
+
+    // Kiểm tra nếu người dùng đã thích ảnh này
+    const alreadyLiked = photo.like.some(
+      (like) => like.user_id.toString() === userId
+    );
+    if (alreadyLiked) {
+      return res.status(400).json({
+        code: 400,
+        message: "Bạn đã thích ảnh này rồi",
+      });
+    }
+
+    // photo.like.push({ user_id: userId });
+    await Photo.updateOne(
+      { _id: photoId },
+      { $push: { like: { user_id: userId } } }
+    );
+
+    const updatedPhoto = await Photo.findById(photoId).select("-__v");
+
+    res.status(200).json({
+      code: 200,
+      message: "Thích ảnh thành công",
+      result: updatedPhoto,
+    });
+  } catch (err) {
+    console.error("Error liking photo:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

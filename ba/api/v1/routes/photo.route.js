@@ -15,4 +15,6 @@ router.post("/create", upload.single("file_name"), photoController.createPhoto);
 
 router.delete("/:photoId", photoController.deletePhoto);
 
+router.post('/:photoId/like', photoController.likePhoto);
+
 module.exports = router;

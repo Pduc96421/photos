@@ -4,16 +4,9 @@ const Comment = require("../models/comment.model");
 // POST /api/v1/comments/:photoId
 module.exports.addCommentToPhoto = async (req, res) => {
   try {
-    const { comment } = req.body;
+    const { comment, parentCommentId } = req.body;
     const photoId = req.params.photoId;
     const user_id = req.user?.id;
-
-    if (!comment || !user_id) {
-      return res.status(400).json({
-        code: 400,
-        message: "Thiếu nội dung bình luận hoặc thông tin người dùng",
-      });
-    }
 
     const photo = await Photo.findById(photoId);
     if (!photo) {
@@ -24,6 +17,7 @@ module.exports.addCommentToPhoto = async (req, res) => {
       comment,
       user_id: user_id,
       photo_id: photo._id,
+      parent_comment_id: parentCommentId || null,
     });
     const savedComment = await newComment.save();
 
@@ -51,20 +45,93 @@ module.exports.addCommentToPhoto = async (req, res) => {
 module.exports.getCommentsByPhoto = async (req, res) => {
   try {
     const photoId = req.params.photoId;
+    const userId = req.user?.id;
 
     const comments = await Comment.find({
       photo_id: photoId,
+      parent_comment_id: null,
     })
-      .populate({ path: "user_id", select: "-password" })
+      .select("-__v")
+      .populate({
+        path: "user_id",
+        select: "_id first_name last_name username",
+      })
       .sort({ date_time: -1 });
+
+    const result = comments.map((comment) => {
+      const isLiked = comment.like.some(
+        (like) => like.user_id.toString() === userId
+      );
+
+      return {
+        _id: comment._id,
+        comment: comment.comment,
+        date_time: comment.date_time,
+        user_id: comment.user_id,
+        photo_id: comment.photo_id,
+        likeLength: comment.like.length,
+        idLiked: isLiked,
+        parent_comment_id: comment.parent_comment_id,
+      };
+    });
 
     res.status(200).json({
       code: 200,
       message: "Lấy bình luận thành công",
-      result: comments,
+      result: result,
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      code: 500,
+      error: err.message,
+    });
+  }
+};
+
+// GET /api/v1/comments/:commentId/replies
+module.exports.getRepliesByComment = async (req, res) => {
+  try {
+    const commentId = req.params.commentId;
+    const userId = req.user?.id;
+
+    const replies = await Comment.find({
+      parent_comment_id: commentId,
+    })
+      .select("-__v")
+      .populate({
+        path: "user_id",
+        select: "_id first_name last_name username",
+      })
+      .sort({ date_time: -1 });
+
+    const result = replies.map((reply) => {
+      const isLiked = reply.like.some(
+        (like) => like.user_id.toString() === userId
+      );
+
+      return {
+        _id: reply._id,
+        comment: reply.comment,
+        date_time: reply.date_time,
+        user_id: reply.user_id,
+        photo_id: reply.photo_id,
+        likeLength: reply.like.length,
+        idLiked: isLiked,
+        parent_comment_id: reply.parent_comment_id,
+      };
+    });
+
+    res.status(200).json({
+      code: 200,
+      message: "Lấy phản hồi thành công",
+      result: result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      error: err.message,
+    });
+    return;
   }
 };
 
@@ -109,4 +176,46 @@ module.exports.deleteComment = async (req, res) => {
     message: "Xóa bình luận thành công",
     result: [],
   });
+};
+
+// POST /api/v1/comments/:commentId/like
+module.exports.likeComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const userId = req.user?.id;
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        code: 404,
+        message: "Không tìm thấy bình luận",
+      });
+    }
+
+    const alreadyLiked = comment.like.some(
+      (like) => like.user_id.toString() === userId
+    );
+
+    if (alreadyLiked) {
+      return res.status(400).json({
+        code: 400,
+        message: "Bạn đã thích bình luận này rồi",
+      });
+    }
+
+    await Comment.updateOne(
+      { _id: commentId },
+      { $push: { like: { user_id: userId } } }
+    );
+
+    const updateComment = await Comment.findById(commentId);
+
+    res.status(200).json({
+      code: 200,
+      message: "Thích bình luận thành công",
+      result: updateComment,
+    });
+  } catch (error) {
+    res.status(500).json({ code: 500, error: error.message });
+  }
 };
