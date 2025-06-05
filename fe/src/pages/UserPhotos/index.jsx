@@ -92,7 +92,7 @@ function UserPhotos() {
                 className="delete-photo-button"
                 aria-label="delete photo"
               >
-                <DeleteIcon />
+                {/* <DeleteIcon /> */}
               </IconButton>
             </div>
 

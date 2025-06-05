@@ -6,6 +6,7 @@ import UserPhotos from "../pages/UserPhotos";
 import PrivateRoutes from "../components/PrivateRoutes/PrivateRoutes";
 import Register from "../pages/Register/Register";
 import UploadImage from "../layouts/UploadImage/UploadImage";
+import UpdateUser from "../pages/UpdateUser/UpdateUser";
 
 const Routes = [
   {
@@ -33,6 +34,10 @@ const Routes = [
               {
                 path: "list",
                 element: <UserList />,
+              },
+              {
+                path: "update-user",
+                element: <UpdateUser />,
               },
             ],
           },

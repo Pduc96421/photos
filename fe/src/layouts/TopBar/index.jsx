@@ -84,6 +84,13 @@ function TopBar() {
               upload
             </button>
 
+            {/* <button
+              className="update-profile-btn"
+              onClick={() => navigate("/users/update-user")}
+            >
+              update profile
+            </button> */}
+
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>

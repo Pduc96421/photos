@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 // GET /api/v1/users/list
 module.exports.listUser = async (req, res) => {
   try {
-    const users = await User.find({}).select("-password -token");
+    const users = await User.find({}).select("-password");
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -15,14 +15,14 @@ module.exports.listUser = async (req, res) => {
 module.exports.detailUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById(userId).select("-password -token");
+    const user = await User.findById(userId).select("-password");
 
     if (!user)
       return res.status(400).json({ message: "Không tìm thấy người dùng" });
 
     res.json(user);
-  } catch (err) {
-    res.status(400).send({ error: "Invalid user ID" });
+  } catch (error) {
+    res.status(500).send({ code: 500, error: error.message });
   }
 };
 
@@ -52,6 +52,8 @@ module.exports.loginUser = async (req, res) => {
         username: user.username,
         first_name: user.first_name,
         last_name: user.last_name,
+        description: user.description,
+        occupation: user.occupation,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
@@ -64,8 +66,8 @@ module.exports.loginUser = async (req, res) => {
       message: "Đăng nhập thành công",
       result: token,
     });
-  } catch (err) {
-    res.status(500).send({ error: "Server bị lỗi" });
+  } catch (error) {
+    res.status(500).send({ code: 500, error: error.message });
   }
 };
 
@@ -91,7 +93,27 @@ module.exports.registerUser = async (req, res) => {
       message: "Đăng ký thành công",
       result: { id: newUser._id, username: newUser.username },
     });
-  } catch (err) {
-    res.status(500).send({ error: "Server bị lỗi" });
+  } catch (error) {
+    res.status(500).send({ code: 500, error: error.message });
+  }
+};
+
+// PATCH /api/v1/users/update
+module.exports.updateUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const updateData = req.body;
+
+    await User.updateOne({ _id: userId }, { $set: updateData });
+
+    const updatedUser = await User.findById(userId).select("-password");
+
+    res.status(200).json({
+      code: 200,
+      message: "Cập nhật thành công",
+      result: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).send({ code: 500, error: error.message });
   }
 };

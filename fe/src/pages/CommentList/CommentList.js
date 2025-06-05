@@ -17,6 +17,12 @@ import SendComment from "../SendComment/SendComment";
 function CommentList({ photoId }) {
   const [comments, setComments] = useState([]);
   const token = getCookie("token");
+  const [myProfile, setMyProfile] = useState([]);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    setMyProfile(user);
+  }, []);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -35,11 +41,10 @@ function CommentList({ photoId }) {
         }
       );
 
-      if (resComments.status === 200) {
-        setComments(resComments.data.result || []);
-      }
+      setComments(resComments.data.result || []);
+      console.log(resComments.data.result);
     } catch (error) {
-      console.error("Lỗi khi lấy bình luận:", error);
+      console.error("Lỗi khi lấy bình luận:", error.response.data);
     }
   };
 
@@ -79,9 +84,11 @@ function CommentList({ photoId }) {
             {comment.comment}
           </Typography>
 
-          <IconButton className="delete-button" aria-label="delete photo">
-            <DeleteIcon />
-          </IconButton>
+          {myProfile.id === comment.user_id._id && (
+            <IconButton className="delete-button" aria-label="delete photo">
+              {/* <DeleteIcon /> */}
+            </IconButton>
+          )}
 
           {index < comments.length - 1 && <Divider variant="middle" />}
         </Box>
