@@ -54,10 +54,7 @@ function CommentList({ photoId }) {
   return (
     <Box className="comments-section" mt={2}>
       <Typography variant="h6">Comments</Typography>
-      <SendComment
-        photoId={photoId}
-        onCommentSent={fetchComments}
-      />
+      <SendComment photoId={photoId} onCommentSent={fetchComments} />
 
       <Divider sx={{ my: 2 }} />
 
@@ -82,10 +79,7 @@ function CommentList({ photoId }) {
             {comment.comment}
           </Typography>
 
-          <IconButton
-            className="delete-button"
-            aria-label="delete photo"
-          >
+          <IconButton className="delete-button" aria-label="delete photo">
             <DeleteIcon />
           </IconButton>
 

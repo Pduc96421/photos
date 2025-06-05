@@ -27,7 +27,7 @@ database.connect();
 app.use("/uploads", express.static("uploads"));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(bodyParser.json());
-app.use(cors(corsOptions));
+app.use(cors());
 
 routeApiVer1(app);
 
