@@ -1,8 +1,16 @@
-import { Typography, Box, Divider, Link as MuiLink } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Divider,
+  Link as MuiLink,
+  IconButton,
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import "./CommentList.scss";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import "./CommentList.scss";
 import { getCookie } from "../../helpers/cookie";
 import SendComment from "../SendComment/SendComment";
 
@@ -39,15 +47,17 @@ function CommentList({ photoId }) {
     if (photoId) {
       fetchComments();
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [photoId, token]);
-
-  // if (!comments || comments.length === 0) return null;
 
   return (
     <Box className="comments-section" mt={2}>
       <Typography variant="h6">Comments</Typography>
-      <SendComment photoId={photoId} onCommentSent={fetchComments} />
+      <SendComment
+        photoId={photoId}
+        onCommentSent={fetchComments}
+      />
 
       <Divider sx={{ my: 2 }} />
 
@@ -67,9 +77,18 @@ function CommentList({ photoId }) {
                 : "Unknown User"}
             </MuiLink>
           </Typography>
+
           <Typography variant="body1" className="comment-text">
             {comment.comment}
           </Typography>
+
+          <IconButton
+            className="delete-button"
+            aria-label="delete photo"
+          >
+            <DeleteIcon />
+          </IconButton>
+
           {index < comments.length - 1 && <Divider variant="middle" />}
         </Box>
       ))}

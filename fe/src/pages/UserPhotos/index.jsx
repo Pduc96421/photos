@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Card, CardContent, CardMedia } from "@mui/material";
+import {
+  Typography,
+  Card,
+  CardContent,
+  CardMedia,
+  IconButton,
+} from "@mui/material";
 import { useParams } from "react-router-dom";
-import "./styles.css";
+import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+
+import "./styles.css";
 import LoadingUi from "../../components/LoadingUi/LoadingUi";
 import CommentList from "../CommentList/CommentList";
 import { getCookie } from "../../helpers/cookie";
@@ -74,11 +82,21 @@ function UserPhotos() {
               alt={`Photo by ${user ? user.first_name : ""}`}
             />
 
-            <CardContent>
+            <div className="photo-header">
               <Typography variant="body2" color="textSecondary">
                 Posted on {formatDate(photo.date_time)}
               </Typography>
 
+              <IconButton
+                // onClick={() => handleDeletePhoto(photo._id)}
+                className="delete-photo-button"
+                aria-label="delete photo"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </div>
+
+            <CardContent>
               <CommentList photoId={photo._id} />
             </CardContent>
           </Card>

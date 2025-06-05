@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const photoSchema = new Schema({
+  title: { type: String, required: true },
   file_name: { type: String },
   date_time: { type: Date, default: Date.now },
   user_id: { type: Schema.Types.ObjectId, ref: "User" },

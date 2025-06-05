@@ -25,10 +25,11 @@ module.exports.getPhotosByUser = async (req, res) => {
       );
       return {
         _id: photo._id,
+        title: photo.title,
         file_name: photo.file_name,
         user_id: photo.user_id,
-        comments: photo.comments,
         date_time: photo.date_time,
+        commentLength: photo.comments.length,
         likeLength: photo.like.length,
         isLiked: isLiked,
       };
@@ -85,6 +86,7 @@ module.exports.getAllPhotos = async (req, res) => {
 module.exports.createPhoto = async (req, res) => {
   try {
     const user_id = req.user?.id;
+    const { title } = req.body;
     const file = req.file;
 
     if (!file || !user_id) {
@@ -96,6 +98,7 @@ module.exports.createPhoto = async (req, res) => {
 
     const newPhoto = new Photo({
       file_name: file.filename,
+      title: title,
       user_id,
     });
 
@@ -194,5 +197,58 @@ module.exports.likePhoto = async (req, res) => {
   } catch (err) {
     console.error("Error liking photo:", err);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// GET /api/v1/photos/search
+module.exports.searchPhotos = async (req, res) => {
+  try {
+    const { keyword } = req.query;
+    const myUserId = req.user?.id;
+
+    if (!keyword) {
+      return res.status(400).json({
+        code: 400,
+        message: "Vui lòng nhập từ khóa tìm kiếm",
+      });
+    }
+
+    const searchRegex = new RegExp(keyword, "i");
+
+    const photos = await Photo.find({
+      title: { $regex: searchRegex },
+    }).populate({
+      path: "comments",
+      select: "_id date_time",
+    });
+
+    const result = photos.map((photo) => {
+      const isLiked = photo.like.some(
+        (like) => like.user_id.toString() === myUserId
+      );
+
+      return {
+        _id: photo._id,
+        title: photo.title,
+        file_name: photo.file_name,
+        user_id: photo.user_id,
+        date_time: photo.date_time,
+        commentLength: photo.comments.length,
+        likeLength: photo.like.length,
+        isLiked: isLiked,
+      };
+    });
+
+    res.status(200).json({
+      code: 200,
+      message: "Tìm kiếm thành công",
+      result: result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      code: 500,
+      message: "Lỗi server",
+      error: err.message,
+    });
   }
 };

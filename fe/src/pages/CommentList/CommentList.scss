@@ -3,11 +3,19 @@
 }
 
 .comment {
+  position: relative;
   padding: 8px 0;
 }
 
 .comment-text {
   margin-top: 4px;
+}
+
+.delete-button{
+  position: absolute !important;
+  top: 8px;
+  right: 8px;
+  color: #ff0000 !important;
 }
 
 .user-link {

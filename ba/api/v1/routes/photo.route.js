@@ -17,4 +17,6 @@ router.delete("/:photoId", photoController.deletePhoto);
 
 router.post('/:photoId/like', photoController.likePhoto);
 
+router.get('/search', photoController.searchPhotos);
+
 module.exports = router;

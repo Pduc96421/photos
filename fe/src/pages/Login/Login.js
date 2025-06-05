@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 import "./Login.scss";
 import { getCookie, setCookie } from "../../helpers/cookie";
@@ -31,6 +32,10 @@ function Login() {
       );
 
       setCookie("token", response.data.result);
+      
+      const decodeToken = jwtDecode(response.data.result);
+      localStorage.setItem("user", JSON.stringify(decodeToken));
+
       dispatch(checkLogin(true));
       navigate("/");
     } catch (error) {

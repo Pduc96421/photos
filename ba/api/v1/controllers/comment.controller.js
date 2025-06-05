@@ -1,11 +1,15 @@
 const Photo = require("../models/photo.model");
 const Comment = require("../models/comment.model");
+const commentSocket = require("../../../sockets/comment.socket");
 
 // POST /api/v1/comments/:photoId
 module.exports.addCommentToPhoto = async (req, res) => {
   try {
-    const { comment, parentCommentId } = req.body;
     const photoId = req.params.photoId;
+
+    // commentSocket(req, res);
+
+    const { comment, parentCommentId } = req.body;
     const user_id = req.user?.id;
 
     const photo = await Photo.findById(photoId);
@@ -35,9 +39,11 @@ module.exports.addCommentToPhoto = async (req, res) => {
       result: populatedComment,
     });
   } catch (err) {
-    res
-      .status(500)
-      .json({ code: 500, message: "Lỗi server", error: err.message });
+    res.status(500).json({
+      code: 500,
+      message: "Lỗi server",
+      error: err.message,
+    });
   }
 };
 

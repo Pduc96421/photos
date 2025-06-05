@@ -32,7 +32,12 @@ function SendComment({ photoId, onCommentSent }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} className="comment-form" mt={2}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      className="comment-form"
+      mt={2}
+    >
       <TextField
         label="Viết bình luận..."
         variant="outlined"

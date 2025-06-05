@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AppBar, Typography, Box } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { jwtDecode } from "jwt-decode";
 
 import "./styles.scss";
 import { deleteCookie, getCookie } from "../../helpers/cookie";
@@ -18,7 +17,6 @@ function TopBar() {
   const [user, setUser] = useState(null);
   const [contextInfo, setContextInfo] = useState("");
   const [username, setUsername] = useState("");
-  const fileInputRef = useRef(null);
 
   const userId =
     pathParts.length >= 3 &&
@@ -27,36 +25,9 @@ function TopBar() {
       : null;
 
   useEffect(() => {
-    const decodeToken = jwtDecode(token);
-    // console.log("Decoded Token:", decodeToken);
-    setUsername(`${decodeToken.first_name} ${decodeToken.last_name}`);
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUsername(`${user.first_name} ${user.last_name}`);
   }, [token]);
-
-  const handleFileChange = async (e) => {
-    const image = e.target.files[0];
-    if (!image) return;
-    const formData = new FormData();
-    formData.append("file_name", image);
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/v1/photos/create",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.status === 200) {
-        console.log(response.data.message, response.data.result);
-      } else {
-        console.error(response.data.message);
-      }
-    } catch (error) {
-      console.error("Error in file upload:", error);
-    }
-  };
 
   useEffect(() => {
     if (userId) {
@@ -66,7 +37,6 @@ function TopBar() {
           setUser(res.data);
         })
         .catch((err) => {
-          console.error("Lỗi lấy user:", err);
           setUser(null);
         });
     } else {
@@ -107,17 +77,9 @@ function TopBar() {
               Xin chào, <strong>{username}</strong>
             </Typography>
 
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-
             <button
               className="upload-btn"
-              onClick={() => fileInputRef.current.click()}
+              onClick={() => navigate("/photos/upload")}
             >
               upload
             </button>
