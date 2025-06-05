@@ -16,7 +16,7 @@ function UserDetail() {
     const fetchUser = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8080/api/v1/users/${userId}`
+          `${process.env.REACT_APP_API_URL}/api/v1/users/${userId}`
         );
         setInfoUser(res.data);
       } catch (err) {

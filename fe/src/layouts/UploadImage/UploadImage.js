@@ -34,7 +34,7 @@ function UploadImage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/photos/create",
+        `${process.env.REACT_APP_API_URL}/api/v1/photos/create`,
         formData,
         {
           headers: {

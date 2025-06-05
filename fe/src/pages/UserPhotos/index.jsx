@@ -27,12 +27,12 @@ function UserPhotos() {
     const fetchUserAndPhotos = async () => {
       try {
         const userRes = await axios.get(
-          `http://localhost:8080/api/v1/users/${userId}`
+          `${process.env.REACT_APP_API_URL}/api/v1/users/${userId}`
         );
         setUser(userRes.data);
 
         const photoRes = await axios.get(
-          `http://localhost:8080/api/v1/photos/${userId}/user`,
+          `${process.env.REACT_APP_API_URL}/api/v1/photos/${userId}/user`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

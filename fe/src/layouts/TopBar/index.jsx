@@ -32,7 +32,7 @@ function TopBar() {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`http://localhost:8080/api/v1/users/${userId}`)
+        .get(`${process.env.REACT_APP_API_URL}/api/v1/users/${userId}`)
         .then((res) => {
           setUser(res.data);
         })

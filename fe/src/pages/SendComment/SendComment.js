@@ -13,7 +13,7 @@ function SendComment({ photoId, onCommentSent }) {
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/v1/comments/${photoId}`,
+        `${process.env.REACT_APP_API_URL}/api/v1/comments/${photoId}`,
         { comment: commentText },
         {
           headers: {

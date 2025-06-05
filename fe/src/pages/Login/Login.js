@@ -22,7 +22,7 @@ function Login() {
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/v1/users/auth/login",
+        `${process.env.REACT_APP_API_URL}/api/v1/users/auth/login`,
         data,
         {
           headers: {
@@ -32,7 +32,7 @@ function Login() {
       );
 
       setCookie("token", response.data.result);
-      
+
       const decodeToken = jwtDecode(response.data.result);
       localStorage.setItem("user", JSON.stringify(decodeToken));
 

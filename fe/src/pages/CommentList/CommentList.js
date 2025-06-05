@@ -27,7 +27,7 @@ function CommentList({ photoId }) {
   const fetchComments = async () => {
     try {
       const resComments = await axios.get(
-        `http://localhost:8080/api/v1/comments/${photoId}`,
+        `${process.env.REACT_APP_API_URL}/api/v1/comments/${photoId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

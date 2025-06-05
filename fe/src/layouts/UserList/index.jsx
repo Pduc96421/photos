@@ -21,7 +21,7 @@ function UserList() {
     const fetchUsers = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/api/v1/users/list"
+          `${process.env.REACT_APP_API_URL}/api/v1/users/list`
         );
         setUsers(response.data);
       } catch (err) {
